@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #060606;
+}
+
+::selection {
+  background-color: rgba(201, 168, 76, 0.3);
+  color: #fff;
+}
+
+/* Premium gold gradient text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #E2C97E 0%, #C9A84C 40%, #A88B3D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle glow behind hero */
+.hero-glow {
+  background: radial-gradient(
+    ellipse 60% 40% at 50% 0%,
+    rgba(201, 168, 76, 0.06) 0%,
+    transparent 70%
+  );
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 168, 76, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(201, 168, 76, 0.05);
+}
+
+/* Divider line with gold center */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 76, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+/* Form input focus glow */
+input:focus {
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.08);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0C0C0C inset;
+  -webkit-text-fill-color: #e5e7eb;
+  border-color: #1a1a1a;
+}
+
+/* CTA button premium effect */
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.btn-premium::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+.btn-premium:hover::before {
+  left: 100%;
+}
+.btn-premium:hover {
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+}
+
+/* Metric number styling */
+.metric-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
