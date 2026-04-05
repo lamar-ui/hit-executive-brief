@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-const KIT_API_KEY = process.env.KIT_API_KEY;
-const KIT_TAG_ID = process.env.KIT_TAG_ID;
+const KIT_API_KEY = process.env.KIT_API_KEY || "0WsI3-Dleh5UsqsceP8u3g";
+const KIT_TAG_ID = process.env.KIT_TAG_ID || "18767608";
 
 export async function POST(request: Request) {
   try {
@@ -22,36 +22,30 @@ export async function POST(request: Request) {
     }
 
     // ── Send to Kit (ConvertKit) ──
-    if (KIT_API_KEY) {
-      const endpoint = KIT_TAG_ID
-        ? `https://api.convertkit.com/v3/tags/${KIT_TAG_ID}/subscribe`
-        : "https://api.convertkit.com/v3/forms"; // fallback
-
-      const res = await fetch(
-        `https://api.convertkit.com/v3/tags/${KIT_TAG_ID}/subscribe`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json; charset=utf-8" },
-          body: JSON.stringify({
-            api_key: KIT_API_KEY,
-            email,
-            first_name: name.split(" ")[0],
-            fields: {
-              last_name: name.split(" ").slice(1).join(" "),
-              company,
-              role,
-              source: "hit-executive-brief",
-            },
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("[Kit API Error]", err);
-        // Don't expose Kit errors to the client — still show success
-        // since we logged the lead below
+    const kitRes = await fetch(
+      `https://api.convertkit.com/v3/tags/${KIT_TAG_ID}/subscribe`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          api_key: KIT_API_KEY,
+          email,
+          first_name: name.split(" ")[0],
+          fields: {
+            last_name: name.split(" ").slice(1).join(" "),
+            company,
+            role,
+            source: "hit-executive-brief",
+          },
+        }),
       }
+    );
+
+    if (!kitRes.ok) {
+      const err = await kitRes.json().catch(() => ({}));
+      console.error("[Kit API Error]", kitRes.status, err);
+    } else {
+      console.log("[Kit Success]", email, "tagged with HIT Executive Brief");
     }
 
     // Always log to server as backup
