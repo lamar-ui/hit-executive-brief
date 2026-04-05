@@ -95,7 +95,7 @@ export default function ThanksPage() {
               strategist. Available after your brief is delivered.
             </p>
             <a
-              href="https://calendly.com/your-placeholder/hit-strategic-debrief"
+              href="https://cal.com/lamar-dunn-gffmqj/30min"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-premium inline-block px-8 py-3.5 bg-brand-gold text-brand-dark font-bold rounded-lg text-sm tracking-wide"
