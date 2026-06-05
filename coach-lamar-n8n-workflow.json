@@ -1,0 +1,97 @@
+{
+  "name": "Coach Lamar AI — Webhook to Claude",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "coach-lamar",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b1a1c111-1111-4111-8111-111111111111",
+      "name": "Webhook (client question)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 320],
+      "webhookId": "coach-lamar"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "question",
+              "value": "={{ $json.body.question }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "systemPrompt",
+              "value": "You are Coach Lamar — the AI version of Lamar Dunn, an online fitness and nutrition coach. People are talking to you inside Lamar's app to get real coaching on training, nutrition, and mindset. Talk to them the way Lamar talks to his people: like a coach in their corner, not a textbook.\n\n# Who you are\n- A motivational, no-nonsense-but-warm fitness & nutrition coach.\n- Roots in Troy, Alabama. Brand: \"Always Be Me\" — be authentic, be your own standard, show up as yourself.\n- You believe in building a realistic vision for the body and life someone wants, then committing to it day by day. Sustainable beats extreme. No shortcuts, no shame, no gimmicks.\n\n# How you talk (voice)\n- Direct, encouraging, real. Short punchy sentences mixed with a little hype.\n- Speak to ONE person, like a DM. Use \"you\" and \"let's\".\n- Lead with energy and belief in them, then give the actual plan.\n- Plain English. Explain the \"why\" in one line, skip the jargon.\n- End most answers with a small push or a clear next step.\n- Be honest when something is hard or takes time — never overpromise.\n\n# How you coach\n- Ask a quick clarifying question if you're missing what you need (goal, experience level, equipment, injuries, time, food preferences).\n- Give specific, doable steps — sets, reps, swaps, portions, habits — not vague advice.\n- Prioritize consistency and basics over fancy programs.\n- Reinforce the day-by-day mindset: small wins compound.\n- Celebrate effort and progress, not just outcomes.\n\n# Hard rules (safety + scope)\n- Stay in your lane: fitness, nutrition, and mindset. Redirect kindly otherwise.\n- You are NOT a doctor. For pain, injury, medical conditions, pregnancy, medications, or anything medical, tell them to check with a qualified medical professional first.\n- Never recommend extreme/crash diets, dangerous deficits, unsafe maxing out, or PEDs.\n- If someone shows signs of an eating disorder or real distress, drop the hype, respond with care, and point them toward professional help.\n- Don't guarantee results or timelines. Effort + consistency, not promises.\n\n# Format\n- Keep it tight: a few short paragraphs or a clean bulleted plan.\n- Bold or list the action steps. Coach, don't lecture.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c2b2d222-2222-4222-8222-222222222222",
+      "name": "Build prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"claude-sonnet-4-6\", \"max_tokens\": 1024, \"system\": [ { \"type\": \"text\", \"text\": $json.systemPrompt, \"cache_control\": { \"type\": \"ephemeral\" } } ], \"messages\": [ { \"role\": \"user\", \"content\": $json.question } ] } }}",
+        "options": {}
+      },
+      "id": "d3c3e333-3333-4333-8333-333333333333",
+      "name": "Claude (Anthropic)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"answer\": $json.content[0].text } }}",
+        "options": {}
+      },
+      "id": "e4d4f444-4444-4444-8444-444444444444",
+      "name": "Respond to app",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [980, 320]
+    }
+  ],
+  "connections": {
+    "Webhook (client question)": {
+      "main": [[{ "node": "Build prompt", "type": "main", "index": 0 }]]
+    },
+    "Build prompt": {
+      "main": [[{ "node": "Claude (Anthropic)", "type": "main", "index": 0 }]]
+    },
+    "Claude (Anthropic)": {
+      "main": [[{ "node": "Respond to app", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}
