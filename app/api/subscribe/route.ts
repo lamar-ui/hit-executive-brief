@@ -26,6 +26,17 @@ export async function POST(request: Request) {
     const firstName = name.split(" ")[0];
     const lastName = name.split(" ").slice(1).join(" ");
 
+        // — Send email notification to lamar@ravisphere.com —
+        try {
+                await fetch("https://formsubmit.co/ajax/lamar@ravisphere.com", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                          body: JSON.stringify({ name, email, company, role, _subject: "New HIT Brief Request" })
+                });
+        } catch (emailErr) {
+                console.error("[Email Notification Error]", emailErr);
+        }
+
     // ── 1. Subscribe to Kit ──
     try {
       const kitRes = await fetch(
