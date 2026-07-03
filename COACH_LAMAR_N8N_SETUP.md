@@ -74,10 +74,18 @@ Anthropic Header-Auth credential on the **Claude** node. Flow:
 
 ```
 Webhook → Route & crisis detect → Crisis? ──true──► Respond: Veterans Crisis card (988→1)
-                                            └─false─► Claude (voice by mode) → Respond: answer
+                                            └─false─► Claude (voice by mode) → Save memory → Respond: answer
 ```
 
-- Your app sends `{ "question": "...", "mode": "fitness" | "22lightson" }`.
+- Your app sends `{ "question": "...", "mode": "fitness" | "22lightson", "sessionId": "abc123" }`.
+- **Conversation memory:** pass a stable `sessionId` per user/thread. The workflow
+  remembers the last ~10 exchanges for that session (stored in n8n's built-in
+  workflow storage — no database needed) and feeds them to Claude so it holds
+  context. New/absent `sessionId` = fresh conversation.
+  > Note: n8n static storage persists on **active** (production) runs, is
+  > best-effort, and is per-workflow. For durable, multi-instance memory, swap the
+  > *Save memory* / load step for a real store (Postgres, Redis, Airtable) — ask
+  > and I'll wire it. Also nothing is stored on the crisis path.
 - **Both system prompts are embedded** in the *Route & crisis detect* Code node;
   it picks the voice by `mode`.
 - **Crisis guard runs first:** a regex check on the message. On a hit it returns
