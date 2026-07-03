@@ -63,3 +63,38 @@ In your `coach-lamar-alwaysbeme` front-end, replace your current AI call with a
 - **Rate limiting / abuse guard** before the Claude call.
 - **Logging** — drop each Q&A into a Google Sheet or Airtable.
 - **Safety post-check** — second pass that flags medical/distress messages.
+
+---
+
+## Hub version (two voices + crisis guard) — `coach-lamar-n8n-workflow-hub.json`
+
+Use this instead of the single-voice file if you want the **Train with Lamar +
+22 Lights On** hub (see `22LIGHTSON_AI_MODE.md`). Same import steps; same
+Anthropic Header-Auth credential on the **Claude** node. Flow:
+
+```
+Webhook → Route & crisis detect → Crisis? ──true──► Respond: Veterans Crisis card (988→1)
+                                            └─false─► Claude (voice by mode) → Respond: answer
+```
+
+- Your app sends `{ "question": "...", "mode": "fitness" | "22lightson" }`.
+- **Both system prompts are embedded** in the *Route & crisis detect* Code node;
+  it picks the voice by `mode`.
+- **Crisis guard runs first:** a regex check on the message. On a hit it returns
+  the Veterans Crisis Line card immediately (dial 988 → press 1 / text 838255 /
+  911) and never sends the message to the model. Deterministic = safe.
+- Test both paths:
+  ```bash
+  # normal (22 Lights On voice)
+  curl -X POST https://alwaysbeme.app.n8n.cloud/webhook/coach-lamar \
+    -H "Content-Type: application/json" \
+    -d '{"question":"Some days I feel invisible.","mode":"22lightson"}'
+
+  # crisis path — should return the 988 card, not an AI reply
+  curl -X POST https://alwaysbeme.app.n8n.cloud/webhook/coach-lamar \
+    -H "Content-Type: application/json" \
+    -d '{"question":"I don't want to be here anymore","mode":"22lightson"}'
+  ```
+
+> The regex is a safety net, not a diagnosis. Keep the app-level crisis check too
+> (belt and suspenders) as described in `22LIGHTSON_AI_MODE.md`.
