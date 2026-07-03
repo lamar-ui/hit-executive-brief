@@ -106,3 +106,31 @@ Webhook → Route & crisis detect → Crisis? ──true──► Respond: Veter
 
 > The regex is a safety net, not a diagnosis. Keep the app-level crisis check too
 > (belt and suspenders) as described in `22LIGHTSON_AI_MODE.md`.
+
+### Q&A logging to Google Sheets
+Two **Log** nodes append every exchange to a Google Sheet so you can see what
+people ask and catch who needs a human:
+
+- **Log — Q&A** runs after each normal answer.
+- **Log — Crisis** runs on the crisis path and flags `FollowUpNeeded = YES`.
+
+Both log **after** the reply is sent, so logging never delays or blocks a
+response (and `onError: continue` means a logging hiccup can't break the chat).
+
+**One-time setup:**
+1. Create a Google Sheet with a tab named **`Log`** and a header row:
+   `Timestamp | SessionId | Mode | Question | Answer | Crisis | FollowUpNeeded`
+2. In n8n: **Credentials → New → Google Sheets OAuth2**, connect your Google account.
+3. Open each **Log** node → pick that credential → set **Document** to your
+   sheet (replace `REPLACE_WITH_YOUR_SPREADSHEET_ID` with the sheet's ID from its URL).
+4. 💡 Filter the sheet on `FollowUpNeeded = YES` (or `Crisis = YES`) to see who to
+   reach out to personally.
+
+> Prefer Airtable, a database, or Slack alerts for crisis flags instead? Say the
+> word and I'll swap the Log nodes.
+
+### Tone: inspiring / high-frequency
+Both system prompts now carry an **Energy** directive — radiate positive,
+motivating, frequency-raising energy. In the 22 Lights On lane it's tuned to
+lift **without** bypassing pain (meet them first, then raise the light), so it
+stays safe for someone who's hurting.
