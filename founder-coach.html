@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome, Founder &middot; 22 Lights On</title>
+<style>
+  :root{--bg:#0e0f13;--panel:#15161c;--line:#2a2b33;--ink:#e8e6e1;--dim:#9a978f;--gold:#f2c14e;--amber:#e39b2f}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,#1c1a12,#0e0f13);
+    color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 3rem}
+  .flame{font-size:2.4rem;filter:drop-shadow(0 0 14px rgba(242,193,78,.7));margin-bottom:.5rem}
+  h1{font-weight:700;font-size:1.9rem;letter-spacing:.3px;margin:.2rem 0;text-align:center}
+  .lede{color:var(--dim);max-width:34rem;line-height:1.6;text-align:center;margin:.4rem 0 1.4rem}
+  .lede strong{color:var(--gold)}
+  /* Inline chat card */
+  .chat{width:min(620px,100%);height:min(620px,72vh);display:flex;flex-direction:column;overflow:hidden;
+    background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.2rem;
+    background:linear-gradient(135deg,#1c1a12,var(--panel));border-bottom:1px solid var(--line)}
+  .title{font-weight:700}
+  .sub{font-size:.8rem;color:#c9a24a;margin-top:2px}
+  .msgs{flex:1;overflow-y:auto;padding:1.1rem;display:flex;flex-direction:column;gap:.6rem}
+  .msg{max-width:82%;padding:.7rem .9rem;border-radius:14px;line-height:1.55;font-size:.97rem;white-space:pre-wrap;word-wrap:break-word}
+  .msg strong{color:var(--gold)}
+  .coach{align-self:flex-start;background:#20222b;border:1px solid var(--line);border-bottom-left-radius:4px}
+  .user{align-self:flex-end;color:#1a1408;background:linear-gradient(135deg,var(--gold),var(--amber));border-bottom-right-radius:4px}
+  .crisisrow{align-self:flex-start;max-width:92%;background:#2a1c12;border:1px solid #6b4a1e;border-radius:14px;padding:.75rem .9rem;line-height:1.55;font-size:.95rem}
+  .typing{align-self:flex-start;color:var(--dim);font-size:.9rem;padding:.3rem .2rem}
+  .typing span{animation:blink 1.2s infinite}.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  .form{display:flex;gap:.5rem;padding:.8rem;border-top:1px solid var(--line);background:var(--panel)}
+  .input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);
+    padding:.7rem .85rem;font-size:.97rem;outline:none;font-family:inherit}
+  .input:focus{border-color:var(--amber)}
+  .send{border:0;cursor:pointer;border-radius:12px;padding:0 1.15rem;font-weight:600;color:#1a1408;
+    background:linear-gradient(135deg,var(--gold),var(--amber))}
+  .send:disabled{opacity:.5;cursor:default}
+  .crisis{padding:.65rem .9rem;font-size:.8rem;color:#c9a24a;background:#12130f;border-top:1px solid var(--line);text-align:center;line-height:1.45}
+  .foot{color:#6f6c64;font-size:.8rem;margin-top:1.4rem;text-align:center}
+  .foot a{color:#c9a24a;text-decoration:none}
+  /* Locked state (shown if someone opens the page without coming from checkout) */
+  .locked{display:none;width:min(520px,100%);text-align:center;background:var(--panel);
+    border:1px solid var(--line);border-radius:20px;padding:2rem 1.5rem;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .locked h2{margin:.2rem 0 .6rem}.locked p{color:var(--dim);line-height:1.6}
+  .btn{display:inline-block;margin-top:1rem;padding:.75rem 1.4rem;border-radius:999px;font-weight:700;
+    color:#1a1408;background:linear-gradient(135deg,var(--gold),var(--amber));text-decoration:none}
+  @media (max-width:640px){ h1{font-size:1.5rem} .chat{height:78vh} }
+</style>
+</head>
+<body>
+  <div class="flame">&#128367;&#65039;</div>
+  <h1 id="hero-title">Welcome to 22 Lights On.</h1>
+  <p class="lede" id="hero-lede">You just did something that matters. <strong>Your light is on now &mdash; and so is ours, for you.</strong> This space is yours. Come as you are.</p>
+
+  <!-- Unlocked coach (default) -->
+  <div class="chat" id="chat">
+    <header class="head">
+      <div><div class="title">22 Lights On</div><div class="sub">Your light still matters.</div></div>
+    </header>
+    <div class="msgs" id="msgs"></div>
+    <form class="form" id="form" autocomplete="off">
+      <input class="input" id="input" type="text" placeholder="Say what's on your mind..." aria-label="Your message" maxlength="1000" required>
+      <button class="send" type="submit">Send</button>
+    </form>
+    <div class="crisis">In crisis? <strong>Veterans Crisis Line: dial 988, press 1</strong> &middot; Text 838255 &middot; 911 if in danger.</div>
+  </div>
+
+  <!-- Locked fallback (only shown when access can't be confirmed) -->
+  <div class="locked" id="locked">
+    <div class="flame">&#128367;&#65039;</div>
+    <h2>This space is for Founders.</h2>
+    <p>The 22 Lights On companion is part of the Founders 100. Step in and your light&mdash;and this&mdash;turns on.</p>
+    <a class="btn" href="https://22lightson.com" id="join-link">Join the movement</a>
+  </div>
+
+  <div class="foot">22 Lights On &middot; <a href="https://22lightson.com">22lightson.com</a></div>
+
+<script>
+(function(){
+  var WEBHOOK_URL = "https://alwaysbeme.app.n8n.cloud/webhook/coach-lamar";
+  var MODE = "22lightson";
+  var WELCOME = "You made it here, Founder. That counts. Whatever brought you today, you don't have to carry it alone. Say what's on your mind, I'm listening.";
+
+  // --- Access check ---------------------------------------------------------
+  // Stripe appends ?session_id=... to your success URL. We treat arrival WITH a
+  // session_id as a valid founder for now (soft gate). To make this airtight,
+  // ask me to add the Stripe-verify Netlify function and flip VERIFY to true.
+  var VERIFY = false;
+  var params = new URLSearchParams(location.search);
+  var sid = params.get("session_id");
+
+  var chat = document.getElementById("chat");
+  var locked = document.getElementById("locked");
+
+  function unlock(){ chat.style.display="flex"; locked.style.display="none"; startCoach(); }
+  function lock(){ chat.style.display="none"; locked.style.display="block";
+    document.getElementById("hero-title").textContent="Almost there.";
+    document.getElementById("hero-lede").innerHTML="This companion is for the Founders 100."; }
+
+  if(!VERIFY){
+    // Soft gate: allow if they arrived from checkout (session_id present) OR
+    // remembered from a previous visit. Bare visits with no history are locked.
+    if(sid){ localStorage.setItem("lo22_founder","1"); }
+    if(sid || localStorage.getItem("lo22_founder")==="1"){ unlock(); } else { lock(); }
+  } else {
+    // Hard gate: verify the Stripe session server-side before unlocking.
+    fetch("/.netlify/functions/verify-access?session_id="+encodeURIComponent(sid||""))
+      .then(function(r){return r.json();})
+      .then(function(d){ if(d && d.paid){ localStorage.setItem("lo22_founder","1"); unlock(); } else { lock(); } })
+      .catch(function(){ if(localStorage.getItem("lo22_founder")==="1"){ unlock(); } else { lock(); } });
+  }
+
+  // --- Coach chat -----------------------------------------------------------
+  function startCoach(){
+    var msgs=document.getElementById("msgs"),form=document.getElementById("form"),
+        input=document.getElementById("input"),sendBtn=form.querySelector(".send");
+    var sessionId=localStorage.getItem("lo22_session");
+    if(!sessionId){sessionId="web-"+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem("lo22_session",sessionId);}
+    function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+    function fmt(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");}
+    function addMsg(t,w){var e=document.createElement("div");e.className="msg "+(w==="user"?"user":w==="crisis"?"crisisrow":"coach");e.innerHTML=fmt(t);msgs.appendChild(e);msgs.scrollTop=msgs.scrollHeight;return e;}
+    function addTyping(){var e=document.createElement("div");e.className="typing";e.innerHTML="<span>&bull;</span><span>&bull;</span><span>&bull;</span>";msgs.appendChild(e);msgs.scrollTop=msgs.scrollHeight;return e;}
+    addMsg(WELCOME,"coach"); input.focus();
+    form.addEventListener("submit",function(e){e.preventDefault();var q=input.value.trim();if(!q)return;
+      addMsg(q,"user");input.value="";sendBtn.disabled=true;var typing=addTyping();
+      fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,mode:MODE,sessionId:sessionId})})
+      .then(function(r){return r.json();})
+      .then(function(d){typing.remove();sendBtn.disabled=false;input.focus();var a=(d&&d.answer)?d.answer:"I'm having trouble connecting right now, but you matter. Veterans Crisis Line: dial 988, press 1, or text 838255.";addMsg(a,d&&d.crisis?"crisis":"coach");})
+      .catch(function(){typing.remove();sendBtn.disabled=false;addMsg("I couldn't reach the line just now. If this is urgent, please contact the Veterans Crisis Line: dial 988, press 1, or text 838255. You are not alone.","crisis");});
+    });
+  }
+})();
+</script>
+</body>
+</html>
