@@ -1,0 +1,193 @@
+{
+  "name": "22 Lights On — Daily Signal (scheduled broadcast)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 7,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "d1111111-1111-4111-8111-111111111111",
+      "name": "Every morning 7:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst start = new Date(now.getFullYear(), 0, 0);\nconst doy = Math.floor((now - start) / 86400000);\nconst wd = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];\nconst themes = [\n  'brotherhood — you are not alone in this',\n  'small wins — one honest step today',\n  'asking for help is strength, not weakness',\n  'honoring the fallen by living forward',\n  'purpose after the uniform',\n  'just one more day — stay',\n  'you are seen and you matter',\n  'rebuild — you are still being written',\n  'reach out to one battle buddy',\n  'the light you keep on saves someone else'\n];\nconst theme = themes[doy % themes.length];\nconst dateISO = now.toISOString();\nconst systemPrompt = \"You are the voice of 22 Lights On \\u2014 a movement for veterans and the people who love them. \\\"22\\\" honors those lost to veteran suicide; the belief is YOUR LIGHT STILL MATTERS. Your words are warm, steady, and uplifting \\u2014 you raise the frequency of whoever reads them.\\n\\nRules of the voice:\\n- Lift people WITHOUT bypassing pain. Honor the hard first, then point to the light. No toxic positivity.\\n- Brotherhood, presence, hope, forward motion. Plain and real. Short lines that hit.\\n- Speak to ONE person reading this on a hard morning.\\n- Never reference suicide methods or give medical/clinical advice.\";\nconst userPrompt = 'Write today\\'s 22 Lights On DAILY SIGNAL — a short (60-90 word) high-frequency message for veterans and their families. Today is ' + wd + '. Theme: ' + theme + '. Requirements: uplifting without bypassing pain; include ONE small, doable nudge (text a buddy, step outside, breathe, reach the VA); no hashtags in the body; end with the exact line \"Keep your light on. — www.22lightson.com\". Return ONLY the message text.';\nreturn [{ json: { dateISO, weekday: wd, theme, systemPrompt, userPrompt } }];"
+      },
+      "id": "d2222222-2222-4222-8222-222222222222",
+      "name": "Signal seed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"claude-sonnet-4-6\", \"max_tokens\": 400, \"system\": [ { \"type\": \"text\", \"text\": $json.systemPrompt, \"cache_control\": { \"type\": \"ephemeral\" } } ], \"messages\": [ { \"role\": \"user\", \"content\": $json.userPrompt } ] } }}",
+        "options": {}
+      },
+      "id": "d3333333-3333-4333-8333-333333333333",
+      "name": "Claude — generate signal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const seed = $('Signal seed').item.json;\nconst signal = ($json.content && $json.content[0]) ? $json.content[0].text.trim() : '';\nreturn [{ json: { date: seed.dateISO, weekday: seed.weekday, theme: seed.theme, signal } }];"
+      },
+      "id": "d4444444-4444-4444-8444-444444444444",
+      "name": "Format signal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Signals",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.date }}",
+            "Weekday": "={{ $json.weekday }}",
+            "Theme": "={{ $json.theme }}",
+            "Signal": "={{ $json.signal }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "d5555555-5555-4555-8555-555555555555",
+      "name": "Log — Signals",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1100,
+        240
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "lamar@22lightson.com",
+        "toEmail": "REPLACE_WITH_LIST_OR_YOUR_EMAIL",
+        "subject": "🕯️ Your 22 Lights On Daily Signal",
+        "emailFormat": "text",
+        "text": "={{ $json.signal }}",
+        "options": {}
+      },
+      "id": "d6666666-6666-4666-8666-666666666666",
+      "name": "Broadcast — Email (configure)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        440
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every morning 7:00": {
+      "main": [
+        [
+          {
+            "node": "Signal seed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signal seed": {
+      "main": [
+        [
+          {
+            "node": "Claude — generate signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude — generate signal": {
+      "main": [
+        [
+          {
+            "node": "Format signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format signal": {
+      "main": [
+        [
+          {
+            "node": "Log — Signals",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Broadcast — Email (configure)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

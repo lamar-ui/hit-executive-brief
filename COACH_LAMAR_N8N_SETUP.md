@@ -129,6 +129,42 @@ response (and `onError: continue` means a logging hiccup can't break the chat).
 > Prefer Airtable, a database, or Slack alerts for crisis flags instead? Say the
 > word and I'll swap the Log nodes.
 
+---
+
+## Daily Signals (scheduled broadcast) — `coach-lamar-daily-signal.json`
+
+A separate workflow that sends a fresh, high-frequency "keep your light on"
+message every morning — in your 22 Lights On voice, never repeating.
+
+```
+Every morning 7:00 → Signal seed (pick theme) → Claude (generate) → Format
+                                                                       ├─► Log — Signals (sheet)
+                                                                       └─► Broadcast — Email
+```
+
+- **Fresh daily:** the *Signal seed* node rotates through 10 themes by day of
+  year (brotherhood, small wins, honoring the fallen, "just one more day," etc.)
+  and passes the weekday, so each morning's message is new.
+- **60–90 words**, uplifting-without-bypassing-pain, always closing with
+  *"Keep your light on. — www.22lightson.com."*
+- **Logged** to a `Signals` tab in your Google Sheet (same sheet is fine).
+- **Broadcast** via the email node — or swap it for SMS/social (see below).
+
+**Setup:**
+1. Import `coach-lamar-daily-signal.json`, attach the same **Anthropic** Header-Auth
+   credential to the Claude node.
+2. Set the schedule (default **7:00 AM**, n8n's server timezone — set your zone in
+   the trigger or n8n settings).
+3. Pick your broadcast channel on the **Broadcast** node:
+   - **Email:** add SMTP/Gmail credentials, set `toEmail` (your list or a group alias).
+   - **SMS:** replace with a **Twilio** node (great for a daily text to members).
+   - **Social/Discord/Slack:** replace with the matching node to auto-post.
+4. (Optional) Add a `Signals` tab to your sheet: `Date | Weekday | Theme | Signal`.
+5. Toggle **Active**. Test now with **Execute Workflow** to preview today's signal.
+
+> Want it to also post the day's signal as an Instagram/Facebook caption draft,
+> or text it to the Founders 100 list? Say the word and I'll wire that channel.
+
 ### Tone: inspiring / high-frequency
 Both system prompts now carry an **Energy** directive — radiate positive,
 motivating, frequency-raising energy. In the 22 Lights On lane it's tuned to
