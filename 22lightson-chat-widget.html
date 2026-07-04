@@ -1,0 +1,205 @@
+<!doctype html>
+<!--
+  22 LIGHTS ON — Website Chat Widget
+  ----------------------------------
+  A self-contained floating chat that talks to your live n8n coach.
+
+  TWO WAYS TO USE THIS FILE:
+  1) TEST NOW: double-click this file to open it in your browser. The widget
+     works against the LIVE webhook immediately (send a message, get a reply).
+  2) EMBED ON 22lightson.com: copy everything between
+        <!-- ===== WIDGET START ===== -->  and  <!-- ===== WIDGET END ===== -->
+     and paste it right before the closing </body> tag of your site
+     (in Netlify: your index.html, a custom HTML embed, or a snippet include).
+
+  CONFIG: the webhook URL + mode are set in the <script> near CONFIG below.
+  If your endpoint ever changes, update WEBHOOK_URL there.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>22 Lights On — Chat Widget (test page)</title>
+<style>
+  /* This page-level styling is only for the standalone TEST page.
+     The widget brings its own scoped styles (prefixed .lo22-) so it won't
+     collide with your real site's CSS. */
+  body{margin:0;min-height:100vh;background:#0e0f13;color:#e8e6e1;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:grid;place-items:center;text-align:center;padding:2rem}
+  .demo h1{font-weight:600;letter-spacing:.5px}
+  .demo p{color:#9a978f;max-width:32rem;line-height:1.6}
+  .demo .hint{margin-top:1.5rem;font-size:.9rem;color:#c9a24a}
+</style>
+</head>
+<body>
+  <div class="demo">
+    <h1>🕯️ 22 Lights On</h1>
+    <p>This is a local test page. The chat button is in the bottom-right corner —
+       click it and send a message. It talks to your live coach.</p>
+    <p class="hint">When it works here, embed the widget on 22lightson.com (see the comment at the top of this file).</p>
+  </div>
+
+<!-- ===== WIDGET START ===== -->
+<div id="lo22-root" aria-live="polite">
+  <button id="lo22-launch" class="lo22-launch" aria-label="Open chat — we're here">
+    <span class="lo22-flame">🕯️</span><span class="lo22-launch-text">We're here</span>
+  </button>
+
+  <div id="lo22-panel" class="lo22-panel" role="dialog" aria-label="22 Lights On chat" hidden>
+    <header class="lo22-head">
+      <div>
+        <div class="lo22-title">22 Lights On</div>
+        <div class="lo22-sub">Your light still matters.</div>
+      </div>
+      <button id="lo22-close" class="lo22-close" aria-label="Close chat">×</button>
+    </header>
+
+    <div id="lo22-msgs" class="lo22-msgs"></div>
+
+    <form id="lo22-form" class="lo22-form" autocomplete="off">
+      <input id="lo22-input" class="lo22-input" type="text"
+             placeholder="Say what's on your mind…" aria-label="Your message" maxlength="1000" required>
+      <button type="submit" class="lo22-send" aria-label="Send">Send</button>
+    </form>
+
+    <div class="lo22-crisis">
+      In crisis? <strong>Veterans Crisis Line: dial 988, press 1</strong> · Text 838255 · 911 if in danger.
+    </div>
+  </div>
+</div>
+
+<style>
+  .lo22-launch{position:fixed;right:20px;bottom:20px;z-index:2147483000;
+    display:flex;align-items:center;gap:.5rem;border:0;cursor:pointer;
+    padding:.75rem 1.1rem;border-radius:999px;font-size:1rem;font-weight:600;
+    color:#1a1408;background:linear-gradient(135deg,#f2c14e,#e39b2f);
+    box-shadow:0 6px 24px rgba(227,155,47,.35);transition:transform .15s ease,box-shadow .15s ease}
+  .lo22-launch:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(227,155,47,.45)}
+  .lo22-flame{font-size:1.2rem;filter:drop-shadow(0 0 6px rgba(242,193,78,.8))}
+  .lo22-panel{position:fixed;right:20px;bottom:20px;z-index:2147483000;
+    width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 32px));
+    display:flex;flex-direction:column;overflow:hidden;
+    background:#15161c;color:#e8e6e1;border:1px solid #2a2b33;border-radius:18px;
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .lo22-head{display:flex;align-items:center;justify-content:space-between;
+    padding:1rem 1.1rem;background:linear-gradient(135deg,#1c1a12,#15161c);
+    border-bottom:1px solid #2a2b33}
+  .lo22-title{font-weight:700;letter-spacing:.3px}
+  .lo22-sub{font-size:.8rem;color:#c9a24a;margin-top:2px}
+  .lo22-close{background:transparent;border:0;color:#8b8880;font-size:1.5rem;
+    line-height:1;cursor:pointer;padding:0 .25rem}
+  .lo22-close:hover{color:#e8e6e1}
+  .lo22-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem}
+  .lo22-msg{max-width:85%;padding:.65rem .85rem;border-radius:14px;line-height:1.5;
+    font-size:.94rem;white-space:pre-wrap;word-wrap:break-word}
+  .lo22-msg strong{color:#f2c14e}
+  .lo22-coach{align-self:flex-start;background:#20222b;border:1px solid #2a2b33;border-bottom-left-radius:4px}
+  .lo22-user{align-self:flex-end;color:#1a1408;
+    background:linear-gradient(135deg,#f2c14e,#e39b2f);border-bottom-right-radius:4px}
+  .lo22-crisisrow{align-self:flex-start;max-width:92%;background:#2a1c12;
+    border:1px solid #6b4a1e;border-radius:14px;padding:.7rem .85rem;line-height:1.5;font-size:.92rem}
+  .lo22-typing{align-self:flex-start;color:#8b8880;font-size:.9rem;padding:.3rem .2rem}
+  .lo22-typing span{animation:lo22blink 1.2s infinite}
+  .lo22-typing span:nth-child(2){animation-delay:.2s}
+  .lo22-typing span:nth-child(3){animation-delay:.4s}
+  @keyframes lo22blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  .lo22-form{display:flex;gap:.5rem;padding:.75rem;border-top:1px solid #2a2b33;background:#15161c}
+  .lo22-input{flex:1;background:#0e0f13;border:1px solid #2a2b33;border-radius:12px;
+    color:#e8e6e1;padding:.65rem .8rem;font-size:.95rem;outline:none}
+  .lo22-input:focus{border-color:#e39b2f}
+  .lo22-send{border:0;cursor:pointer;border-radius:12px;padding:0 1rem;font-weight:600;
+    color:#1a1408;background:linear-gradient(135deg,#f2c14e,#e39b2f)}
+  .lo22-send:disabled{opacity:.5;cursor:default}
+  .lo22-crisis{padding:.6rem .9rem;font-size:.78rem;color:#c9a24a;background:#12130f;
+    border-top:1px solid #2a2b33;text-align:center;line-height:1.4}
+  @media (max-width:420px){
+    .lo22-panel{right:0;bottom:0;width:100vw;height:100vh;border-radius:0}
+  }
+</style>
+
+<script>
+(function(){
+  // ===== CONFIG =====
+  var WEBHOOK_URL = "https://alwaysbeme.app.n8n.cloud/webhook/coach-lamar";
+  var MODE = "22lightson"; // the voice this widget uses
+  var WELCOME = "You made it here. That counts. Say whatever's on your mind — I'm listening. You don't have to have it together to be here.";
+  // ==================
+
+  var root = document.getElementById("lo22-root");
+  var launch = document.getElementById("lo22-launch");
+  var panel = document.getElementById("lo22-panel");
+  var closeBtn = document.getElementById("lo22-close");
+  var msgs = document.getElementById("lo22-msgs");
+  var form = document.getElementById("lo22-form");
+  var input = document.getElementById("lo22-input");
+  var sendBtn = form.querySelector(".lo22-send");
+  var opened = false;
+
+  // Stable per-visitor session id so the coach remembers the thread.
+  var sessionId = localStorage.getItem("lo22_session");
+  if(!sessionId){
+    sessionId = "web-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("lo22_session", sessionId);
+  }
+
+  function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+  // Render **bold** and newlines from the coach's markdown-ish replies, safely.
+  function fmt(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");}
+
+  function addMsg(text, who){
+    var el = document.createElement("div");
+    el.className = "lo22-msg " + (who==="user" ? "lo22-user" : who==="crisis" ? "lo22-crisisrow" : "lo22-coach");
+    el.innerHTML = fmt(text);
+    msgs.appendChild(el);
+    msgs.scrollTop = msgs.scrollHeight;
+    return el;
+  }
+  function addTyping(){
+    var el = document.createElement("div");
+    el.className = "lo22-typing";
+    el.innerHTML = "<span>•</span><span>•</span><span>•</span>";
+    msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
+    return el;
+  }
+
+  function openPanel(){
+    panel.hidden = false; launch.style.display = "none";
+    input.focus();
+    if(!opened){ opened = true; addMsg(WELCOME, "coach"); }
+  }
+  function closePanel(){ panel.hidden = true; launch.style.display = "flex"; }
+
+  launch.addEventListener("click", openPanel);
+  closeBtn.addEventListener("click", closePanel);
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = input.value.trim();
+    if(!q) return;
+    addMsg(q, "user");
+    input.value = ""; sendBtn.disabled = true;
+    var typing = addTyping();
+
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ question: q, mode: MODE, sessionId: sessionId })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      typing.remove(); sendBtn.disabled = false; input.focus();
+      var answer = (data && data.answer) ? data.answer : "I'm having trouble connecting right now — but you matter, and you don't have to wait on me. Veterans Crisis Line: dial 988, press 1, or text 838255.";
+      addMsg(answer, data && data.crisis ? "crisis" : "coach");
+    })
+    .catch(function(){
+      typing.remove(); sendBtn.disabled = false;
+      addMsg("I couldn't reach the line just now. If this is urgent, please contact the Veterans Crisis Line: dial 988, press 1, or text 838255. You are not alone.", "crisis");
+    });
+  });
+})();
+</script>
+<!-- ===== WIDGET END ===== -->
+</body>
+</html>
