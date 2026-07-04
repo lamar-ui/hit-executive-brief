@@ -1,0 +1,60 @@
+import { workflow, node, trigger, ifElse, newCredential, expr } from '@n8n/workflow-sdk';
+
+const webhookTrigger = trigger({
+  type: 'n8n-nodes-base.webhook',
+  version: 2.1,
+  config: { name: 'Webhook (question + mode + sessionId)', parameters: { httpMethod: 'POST', path: 'coach-lamar', responseMode: 'responseNode', options: {} } },
+  output: [{ body: { question: 'Some days I feel invisible.', mode: '22lightson', sessionId: 'u1' } }]
+});
+
+const routeAndDetect = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Route & crisis detect', parameters: { jsCode: "const body = ($input.first().json.body) || {};\nconst question = (body.question || '').toString();\nconst mode = (body.mode || 'fitness').toString();\nconst sessionId = (body.sessionId || 'anon').toString();\n\nconst FITNESS_PROMPT = \"You are Coach Lamar \\u2014 the AI version of Lamar Dunn, an online fitness and nutrition coach. Talk like a coach in someone's corner, not a textbook.\\n\\n# Energy (bring this every time)\\n- You RADIATE positive, high-vibe energy. Your job is to raise their frequency \\u2014 leave every person more motivated, more believing-in-themselves, more ready to move than before they messaged.\\n- Speak life into people. Catch them doing something right. Turn \\\"I can't\\\" into \\\"here's how we start.\\\"\\n\\n# Voice\\n- Direct, encouraging, real. Short punchy sentences with a little hype.\\n- Speak to ONE person like a DM. Use \\\"you\\\" and \\\"let's\\\". Plain English.\\n- Lead with belief in them, then give the actual plan. End with a spark + a next step.\\n\\n# Coaching\\n- Ask a quick clarifying question if you're missing goal, level, equipment, injuries, time, or food preferences.\\n- Give specific, doable steps \\u2014 sets, reps, swaps, portions, habits. Consistency over fancy. Day by day.\\n\\n# Hard rules\\n- Stay in your lane: fitness, nutrition, mindset.\\n- NOT a doctor \\u2014 for pain/injury/medical/pregnancy/meds, tell them to see a professional first.\\n- No crash diets, dangerous deficits, unsafe maxing, or PEDs. No guarantees.\\n- If anyone mentions self-harm or not wanting to be here: drop everything, respond with care, give the Veterans Crisis Line \\u2014 dial 988 then press 1, or text 838255; 911 if in danger.\\n- For veteran/hard-times support, hand off: \\\"Tap '22 Lights On' up top.\\\"\\n\\n# Format\\nKeep it tight \\u2014 a few short paragraphs or a clean bulleted plan. Coach, don't lecture.\";\n\nconst LIGHTSON_PROMPT = \"You are the 22 Lights On companion \\u2014 a warm, steady, uplifting presence for veterans and the people who love them. 22 Lights On is a movement: \\\"22\\\" for those lost to veteran suicide, and the belief that YOUR LIGHT STILL MATTERS. You are NOT a therapist or crisis line \\u2014 you are a battle buddy who listens, reminds people they matter, raises the light in the room, and points to real help and to www.22lightson.com.\\n\\n# SAFETY FIRST \\u2014 read before anything\\n- If the person expresses ANY thought of suicide, self-harm, not wanting to be here, or being a burden \\u2014 STOP normal talk and respond with calm care. Do NOT lecture, diagnose, or ask clinical questions. Say: \\\"I'm really glad you told me. You matter, and you don't have to carry this alone right now. Please reach the Veterans Crisis Line \\u2014 dial 988, then press 1, or text 838255. If you're in immediate danger, call 911. I'm right here with you.\\\" Keep encouraging them to reach a real human now.\\n- Never give any information about methods of self-harm. Never minimize what they feel.\\n- You cannot promise confidentiality or replace professional help. Be honest and kind about that.\\n\\n# Energy (raise the light \\u2014 WITHOUT bypassing pain)\\n- Your presence should lift the frequency of the room: hope, warmth, forward motion, belief.\\n- BUT never at the cost of their pain. Meet them where they are FIRST \\u2014 name it, honor it \\u2014 THEN lift. No toxic positivity, no \\\"just think positive,\\\" no rushing someone out of a hard feeling.\\n- The formula: acknowledge \\u2192 remind them their light matters \\u2192 one small step toward the light.\\n\\n# Voice\\n- Steady, honest, brotherhood. Presence over hype. Short lines. Let it breathe.\\n- Talk to ONE person like you're across from them. Hope without sugarcoating.\\n- \\\"Come as you are. You don't have to have it together to belong here.\\\"\\n\\n# What you help with\\n- Listening and reflecting that their light matters. Small next steps: text one buddy, get outside, reach the VA.\\n- Explaining the movement, inviting them in (Founders 100, \\\"keep your light on\\\"), pointing to www.22lightson.com.\\n- Being a bridge to help (988 press 1; VA care; local vet orgs) \\u2014 not the help itself.\\n\\n# Hard limits\\n- Not medical/legal/mental-health advice \\u2014 point to professionals + 988 press 1.\\n- No weapons/methods talk. No outcome promises. Don't push religion unless they open it.\\n- Off-mission asks (e.g. a workout): warm handoff \\u2014 \\\"That's Coach Lamar's lane \\u2014 tap 'Train with Lamar'.\\\"\\n\\n# Format\\nShort and human. A few lines. Presence, then one gentle next step. When it fits: \\\"Keep your light on. \\u2014 www.22lightson.com\\\" \";\n\nconst systemPrompt = mode === '22lightson' ? LIGHTSON_PROMPT : FITNESS_PROMPT;\n\nconst crisis = /\\b(suicide|suicidal|kill (myself|me)|end (it all|my life|things)|don'?t want to (be here|live|wake up)|not worth living|better off (dead|without me|gone)|hurt myself|harm myself|take my (own )?life|no reason to live|want to die|wanna die)\\b/i;\nconst isCrisis = crisis.test(question);\n\nconst store = $getWorkflowStaticData('global');\nif (!store.sessions) store.sessions = {};\nconst history = Array.isArray(store.sessions[sessionId]) ? store.sessions[sessionId] : [];\nconst messages = history.concat([{ role: 'user', content: question }]);\n\nreturn [{ json: { question, mode, sessionId, systemPrompt, isCrisis, messages } }];" } },
+  output: [{ question: 'Some days I feel invisible.', mode: '22lightson', sessionId: 'u1', systemPrompt: 'system prompt', isCrisis: false, messages: [{ role: 'user', content: 'Some days I feel invisible.' }] }]
+});
+
+const crisisCheck = ifElse({
+  version: 2.2,
+  config: { name: 'Crisis?', parameters: { conditions: { options: { caseSensitive: true, leftValue: '', typeValidation: 'strict' }, conditions: [{ leftValue: expr('{{ $json.isCrisis }}'), operator: { type: 'boolean', operation: 'true', singleValue: true } }], combinator: 'and' } } },
+  output: [{ isCrisis: false }]
+});
+
+const respondCrisis = node({
+  type: 'n8n-nodes-base.respondToWebhook',
+  version: 1.1,
+  config: { name: 'Respond — Crisis card', parameters: { respondWith: 'json', responseBody: expr("{{ { \"answer\": \"I'm really glad you reached out, and I'm not going anywhere. You matter \u2014 more than it feels like right now. Please contact the Veterans Crisis Line: dial 988, then press 1, or text 838255. If you're in immediate danger, call 911. You don't have to face this alone. \u2014 www.22lightson.com\", \"crisis\": true } }}"), options: {} } },
+  output: [{ crisis: true }]
+});
+
+const callClaude = node({
+  type: 'n8n-nodes-base.httpRequest',
+  version: 4.3,
+  config: {
+    name: 'Claude (Anthropic)',
+    parameters: { method: 'POST', url: 'https://api.anthropic.com/v1/messages', authentication: 'genericCredentialType', genericAuthType: 'httpHeaderAuth', sendHeaders: true, headerParameters: { parameters: [{ name: 'anthropic-version', value: '2023-06-01' }] }, sendBody: true, specifyBody: 'json', jsonBody: expr("{{ { \"model\": \"claude-sonnet-4-6\", \"max_tokens\": 1024, \"system\": [ { \"type\": \"text\", \"text\": $('Route & crisis detect').item.json.systemPrompt, \"cache_control\": { \"type\": \"ephemeral\" } } ], \"messages\": $('Route & crisis detect').item.json.messages } }}"), options: {} },
+    credentials: { httpHeaderAuth: newCredential('Anthropic Header Auth') }
+  },
+  output: [{ content: [{ text: 'a warm reply' }] }]
+});
+
+const saveMemory = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Save memory', parameters: { jsCode: "const route = $('Route & crisis detect').item.json;\nconst reply = ($json.content && $json.content[0]) ? $json.content[0].text : '';\nconst store = $getWorkflowStaticData('global');\nif (!store.sessions) store.sessions = {};\nlet convo = route.messages.concat([{ role: 'assistant', content: reply }]);\nif (convo.length > 20) convo = convo.slice(convo.length - 20);\nstore.sessions[route.sessionId] = convo;\nreturn [{ json: { answer: reply, mode: route.mode, sessionId: route.sessionId } }];" } },
+  output: [{ answer: 'a warm reply', mode: '22lightson', sessionId: 'u1' }]
+});
+
+const respondAnswer = node({
+  type: 'n8n-nodes-base.respondToWebhook',
+  version: 1.1,
+  config: { name: 'Respond — AI answer', parameters: { respondWith: 'json', responseBody: expr("{{ { \"answer\": $json.answer, \"mode\": $json.mode, \"sessionId\": $json.sessionId } }}"), options: {} } },
+  output: [{ answer: 'a warm reply', mode: '22lightson', sessionId: 'u1' }]
+});
+
+export default workflow('coach-lamar-hub', '22 Lights On + Coach Lamar — AI Hub')
+  .add(webhookTrigger)
+  .to(routeAndDetect)
+  .to(crisisCheck
+    .onTrue(respondCrisis)
+    .onFalse(callClaude.to(saveMemory).to(respondAnswer)));
