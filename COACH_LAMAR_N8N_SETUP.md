@@ -137,9 +137,9 @@ A separate workflow that sends a fresh, high-frequency "keep your light on"
 message every morning — in your 22 Lights On voice, never repeating.
 
 ```
-Every morning 7:00 → Signal seed (pick theme) → Claude (generate) → Format
-                                                                       ├─► Log — Signals (sheet)
-                                                                       └─► Broadcast — Email
+Every morning 7:00 → Signal seed → Claude (signal) → Format → Caption seed
+   → Claude (caption) → Format → ├─► Log — Signals + Caption (sheet)
+                                 └─► Broadcast — Email (signal + caption)
 ```
 
 - **Fresh daily:** the *Signal seed* node rotates through 10 themes by day of
@@ -147,8 +147,15 @@ Every morning 7:00 → Signal seed (pick theme) → Claude (generate) → Format
   and passes the weekday, so each morning's message is new.
 - **60–90 words**, uplifting-without-bypassing-pain, always closing with
   *"Keep your light on. — www.22lightson.com."*
-- **Logged** to a `Signals` tab in your Google Sheet (same sheet is fine).
-- **Broadcast** via the email node — or swap it for SMS/social (see below).
+- **Auto-drafts a social caption too:** a second pass turns the signal into a
+  ready-to-post Instagram/Facebook caption — scroll-stopping hook, CTA to
+  www.22lightson.com, the Veterans Crisis Line, and your hashtags
+  (`#22LightsOn #YourLightStillMatters #AlwaysBeMe #Veterans #NotOneMore
+  #KeepYourLightOn`).
+- **Logged** to a `Signals` tab (`Date | Weekday | Theme | Signal | Caption`)
+  so each morning you've got the caption ready to copy-paste.
+- **Broadcast** email contains BOTH the signal and the ready-to-post caption —
+  or swap the node for SMS/social (see below).
 
 **Setup:**
 1. Import `coach-lamar-daily-signal.json`, attach the same **Anthropic** Header-Auth
@@ -159,7 +166,7 @@ Every morning 7:00 → Signal seed (pick theme) → Claude (generate) → Format
    - **Email:** add SMTP/Gmail credentials, set `toEmail` (your list or a group alias).
    - **SMS:** replace with a **Twilio** node (great for a daily text to members).
    - **Social/Discord/Slack:** replace with the matching node to auto-post.
-4. (Optional) Add a `Signals` tab to your sheet: `Date | Weekday | Theme | Signal`.
+4. (Optional) Add a `Signals` tab to your sheet: `Date | Weekday | Theme | Signal | Caption`.
 5. Toggle **Active**. Test now with **Execute Workflow** to preview today's signal.
 
 > Want it to also post the day's signal as an Instagram/Facebook caption draft,

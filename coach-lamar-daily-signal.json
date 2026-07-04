@@ -1,5 +1,5 @@
 {
-  "name": "22 Lights On — Daily Signal (scheduled broadcast)",
+  "name": "22 Lights On — Daily Signal + Social Caption (scheduled)",
   "nodes": [
     {
       "parameters": {
@@ -18,8 +18,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        220,
-        340
+        160,
+        360
       ]
     },
     {
@@ -31,8 +31,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        440,
-        340
+        360,
+        360
       ]
     },
     {
@@ -60,8 +60,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        660,
-        340
+        560,
+        360
       ]
     },
     {
@@ -73,8 +73,63 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        880,
-        340
+        760,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $json;\nconst systemPrompt = \"You are the voice of 22 Lights On \\u2014 a movement for veterans and the people who love them. \\\"22\\\" honors those lost to veteran suicide; the belief is YOUR LIGHT STILL MATTERS. Your words are warm, steady, and uplifting \\u2014 you raise the frequency of whoever reads them.\\n\\nRules of the voice:\\n- Lift people WITHOUT bypassing pain. Honor the hard first, then point to the light. No toxic positivity.\\n- Brotherhood, presence, hope, forward motion. Plain and real. Short lines that hit.\\n- Speak to ONE person reading this on a hard morning.\\n- Never reference suicide methods or give medical/clinical advice.\";\nconst userPrompt = 'Turn this 22 Lights On daily signal into an Instagram/Facebook caption. Keep the heart of the message. Start with a scroll-stopping first line (hook). Stay warm and high-frequency without bypassing pain. Add a gentle CTA to join the movement at www.22lightson.com. Then on new lines add exactly:\\n\\n\\uD83D\\uDCDE Veterans Crisis Line: dial 988, then press 1 \\u2022 Text 838255\\n\\n#22LightsOn #YourLightStillMatters #AlwaysBeMe #Veterans #NotOneMore #KeepYourLightOn\\n\\nReturn ONLY the caption. Here is the signal:\\n\\n' + s.signal;\nreturn [{ json: { date: s.date, weekday: s.weekday, theme: s.theme, signal: s.signal, systemPrompt, userPrompt } }];"
+      },
+      "id": "d7777777-7777-4777-8777-777777777777",
+      "name": "Caption seed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"claude-sonnet-4-6\", \"max_tokens\": 500, \"system\": [ { \"type\": \"text\", \"text\": $json.systemPrompt, \"cache_control\": { \"type\": \"ephemeral\" } } ], \"messages\": [ { \"role\": \"user\", \"content\": $json.userPrompt } ] } }}",
+        "options": {}
+      },
+      "id": "d8888888-8888-4888-8888-888888888888",
+      "name": "Claude — draft caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const seed = $('Caption seed').item.json;\nconst caption = ($json.content && $json.content[0]) ? $json.content[0].text.trim() : '';\nreturn [{ json: { date: seed.date, weekday: seed.weekday, theme: seed.theme, signal: seed.signal, caption } }];"
+      },
+      "id": "d9999999-9999-4999-8999-999999999999",
+      "name": "Format caption",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        360
       ]
     },
     {
@@ -97,7 +152,8 @@
             "Date": "={{ $json.date }}",
             "Weekday": "={{ $json.weekday }}",
             "Theme": "={{ $json.theme }}",
-            "Signal": "={{ $json.signal }}"
+            "Signal": "={{ $json.signal }}",
+            "Caption": "={{ $json.caption }}"
           },
           "matchingColumns": [],
           "schema": []
@@ -105,11 +161,11 @@
         "options": {}
       },
       "id": "d5555555-5555-4555-8555-555555555555",
-      "name": "Log — Signals",
+      "name": "Log — Signals + Caption",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        1100,
+        1580,
         240
       ],
       "onError": "continueRegularOutput"
@@ -118,9 +174,9 @@
       "parameters": {
         "fromEmail": "lamar@22lightson.com",
         "toEmail": "REPLACE_WITH_LIST_OR_YOUR_EMAIL",
-        "subject": "🕯️ Your 22 Lights On Daily Signal",
+        "subject": "🕯️ Your 22 Lights On Daily Signal + caption",
         "emailFormat": "text",
-        "text": "={{ $json.signal }}",
+        "text": "={{ 'TODAY\\'S SIGNAL:\\n\\n' + $json.signal + '\\n\\n— — — — —\\n\\nREADY-TO-POST CAPTION:\\n\\n' + $json.caption }}",
         "options": {}
       },
       "id": "d6666666-6666-4666-8666-666666666666",
@@ -128,8 +184,8 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        1100,
-        440
+        1580,
+        460
       ],
       "onError": "continueRegularOutput"
     }
@@ -172,7 +228,40 @@
       "main": [
         [
           {
-            "node": "Log — Signals",
+            "node": "Caption seed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caption seed": {
+      "main": [
+        [
+          {
+            "node": "Claude — draft caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude — draft caption": {
+      "main": [
+        [
+          {
+            "node": "Format caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format caption": {
+      "main": [
+        [
+          {
+            "node": "Log — Signals + Caption",
             "type": "main",
             "index": 0
           },
