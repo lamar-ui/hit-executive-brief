@@ -8,6 +8,27 @@
 
 ---
 
+## Deploy list for tomorrow (do these in order)
+1. Confirm the n8n tools are loaded (fresh session boots with the connector).
+2. `list_credentials` — if no **Anthropic Header Auth** credential exists, ask Lamar
+   to create one in n8n (Header Auth: name `x-api-key`, value = his Anthropic key),
+   or have his key ready to paste.
+3. Deploy the **hub**: `create_workflow_from_code` using `n8n-sdk/coach-lamar-hub.sdk.ts`
+   → then `validate_workflow`.
+4. Deploy the **daily signal**: `create_workflow_from_code` using
+   `n8n-sdk/coach-lamar-daily-signal.sdk.ts` → `validate_workflow`.
+5. Attach the **Anthropic Header Auth** credential to every Claude node.
+   (Optional now: Google Sheets + SMTP creds for logging/broadcast.)
+6. Live test the hub: send a normal message and a crisis-phrase message; confirm
+   the crisis one returns the 988 card. Then `test_workflow` / Execute the daily one.
+7. Activate both (or `publish_workflow`).
+
+> SDK files (`n8n-sdk/*.sdk.ts`) are generated from the QA-passed logic but were
+> NOT validated live (connector was down when written) — run `validate_workflow`
+> after creating each, and fix any node version/param mismatch it flags.
+> The `coach-lamar-*.json` files are the same workflows as importable JSON (a
+> manual-import fallback if the SDK path has any issue).
+
 ## Context (what's already built, on branch `claude/instagram-voice-sample-ThnkD`)
 - `coach-lamar-n8n-workflow-hub.json` — live chat: 2 voices (Train with Lamar +
   22 Lights On) + conversation memory + crisis guard (988) + Google Sheets logging.
