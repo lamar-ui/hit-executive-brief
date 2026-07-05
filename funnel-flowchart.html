@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>22 Lights On — Funnel, Routes & QA</title>
+<style>
+  :root{--bg:#0e0f13;--panel:#15161c;--line:#2a2b33;--ink:#e8e6e1;--dim:#9a978f;--gold:#f2c14e;--amber:#e39b2f;--green:#5bbf7a;--red:#e0674a}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1000px 500px at 50% -10%,#1c1a12,#0e0f13);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:2rem 1rem 4rem;line-height:1.5}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{text-align:center;letter-spacing:.3px}h1 .f{filter:drop-shadow(0 0 10px rgba(242,193,78,.6))}
+  h2{margin:2.2rem 0 .8rem;border-bottom:1px solid var(--line);padding-bottom:.4rem;color:var(--gold)}
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:.8rem 1.1rem;min-width:260px;max-width:520px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .box .t{font-weight:700}.box .s{font-size:.82rem;color:var(--dim);margin-top:3px}
+  .box.gold{border-color:var(--amber);background:linear-gradient(135deg,#1c1a12,var(--panel))}
+  .box.entry{border-color:#3a5f8a}.box.n8n{border-color:#7a4ea0}.box.claude{border-color:var(--amber)}
+  .box.crisis{border-color:#6b4a1e;background:#2a1c12}
+  .arrow{color:var(--dim);font-size:1.4rem;line-height:1;margin:.35rem 0}
+  .split{display:flex;gap:1.5rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;width:100%}
+  .col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:250px}
+  .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.15rem .5rem;border-radius:99px;margin-bottom:.35rem}
+  .tag.yes{background:#3a1c14;color:var(--red);border:1px solid #6b4a1e}
+  .tag.no{background:#12261a;color:var(--green);border:1px solid #275c3b}
+  table{width:100%;border-collapse:collapse;margin-top:.5rem;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:.55rem .7rem;text-align:left;vertical-align:top}
+  th{background:#1a1b22;color:var(--gold)}
+  code{background:#12130f;border:1px solid var(--line);border-radius:6px;padding:.05rem .35rem;font-size:.86em;color:#d9c58a}
+  ul.qa{list-style:none;padding:0}
+  ul.qa li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;margin:.4rem 0;display:flex;gap:.6rem;align-items:flex-start}
+  ul.qa li b{color:var(--gold)}
+  .chk{color:var(--green);font-weight:700;flex:0 0 auto}
+  .muted{color:var(--dim);font-size:.85rem}
+</style></head><body><div class="wrap">
+<h1><span class="f">🕯️</span> 22 Lights On — Funnel, Routes &amp; QA</h1>
+<p class="muted" style="text-align:center">The full path from visitor/buyer to a live coach reply, plus every route and a validation checklist.</p>
+
+<h2>The Funnel</h2>
+<div class="flow">
+  <div class="split">
+    <div class="col">
+      <div class="box entry"><div class="t">Visitor on 22lightson.com</div><div class="s">clicks the 🕯️ chat widget</div></div>
+    </div>
+    <div class="col">
+      <div class="box entry"><div class="t">Buyer → Stripe Checkout</div><div class="s">Founders 100 payment</div></div>
+      <div class="arrow">↓</div>
+      <div class="box gold"><div class="t">Redirect → /coach.html</div><div class="s">Stripe adds <code>?session_id=…</code></div></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="box gold"><div class="t">Coach page loads</div><div class="s">gate check: session_id present OR founder flag?</div></div>
+  <div class="split">
+    <div class="col">
+      <span class="tag no">UNLOCKED</span>
+      <div class="box"><div class="t">Coach chat opens</div><div class="s">flame avatar + welcome</div></div>
+    </div>
+    <div class="col">
+      <span class="tag yes">NO ACCESS</span>
+      <div class="box"><div class="t">"For Founders" screen</div><div class="s">→ Join the movement</div></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="box"><div class="t">User sends a message</div><div class="s">POST → n8n webhook <code>/webhook/coach-lamar</code></div><div class="s"><code>{ question, mode:"22lightson", sessionId }</code></div></div>
+  <div class="arrow">↓</div>
+  <div class="box n8n"><div class="t">n8n: Route &amp; crisis detect</div><div class="s">load memory · pick voice · scan for crisis words</div></div>
+  <div class="arrow">↓</div>
+  <div class="box n8n"><div class="t">Crisis?</div></div>
+  <div class="split">
+    <div class="col">
+      <span class="tag yes">YES — crisis word</span>
+      <div class="box crisis"><div class="t">988 Crisis Card</div><div class="s">deterministic · no AI · dial 988 press 1</div></div>
+    </div>
+    <div class="col">
+      <span class="tag no">NO</span>
+      <div class="box claude"><div class="t">Claude (Anthropic)</div><div class="s">22 Lights On voice + memory</div></div>
+      <div class="arrow">↓</div>
+      <div class="box n8n"><div class="t">Save memory</div><div class="s">store the exchange (per sessionId)</div></div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="box gold"><div class="t">Reply rendered in chat</div><div class="s">"Keep your light on. — www.22lightson.com"</div></div>
+</div>
+
+<h2>Routes to verify</h2>
+<table>
+  <tr><th>Route / endpoint</th><th>Expected</th></tr>
+  <tr><td><code>https://22lightson.com/coach.html</code> (no param, fresh browser)</td><td>Locked "For Founders" screen</td></tr>
+  <tr><td><code>…/coach.html?session_id=test</code></td><td>Unlocked coach + welcome + flame avatar</td></tr>
+  <tr><td>Chat send — normal message</td><td>Warm reply ending "Keep your light on. — www.22lightson.com"</td></tr>
+  <tr><td>Chat send — "I have no reason to live"</td><td>988 crisis card (amber box), no AI</td></tr>
+  <tr><td>Site widget (if snippet injected)</td><td>🕯️ button on every page → same coach</td></tr>
+  <tr><td>Webhook <code>POST /webhook/coach-lamar</code></td><td>200 JSON: <code>{answer, ...}</code> or <code>{answer, crisis:true}</code></td></tr>
+  <tr><td>Existing app routes (<code>/crisis</code>, <code>/ticker</code>, home)</td><td>Unchanged — coach is additive only</td></tr>
+</table>
+
+<h2>QA / Validation checklist</h2>
+<ul class="qa">
+  <li><span class="chk">✅</span><div><b>Coach page JS</b> — syntax-validated (<code>node --check</code> passes); avatar bug fixed.</div></li>
+  <li><span class="chk">✅</span><div><b>n8n workflow logic</b> — 56/56 automated checks (routing, crisis detect, memory, no false crisis on gym talk).</div></li>
+  <li><span class="chk">✅</span><div><b>Crisis guard</b> — deterministic 988 card verified firing on production webhook.</div></li>
+  <li><span class="chk">☐</span><div><b>Funnel test</b> — do a Stripe <b>test-mode</b> purchase → confirm redirect lands on unlocked coach.</div></li>
+  <li><span class="chk">☐</span><div><b>Locked state</b> — open <code>/coach.html</code> in a private window → confirm "For Founders" screen.</div></li>
+  <li><span class="chk">☐</span><div><b>Reply on live</b> — send a message on the deployed page → real coach reply.</div></li>
+  <li><span class="chk">☐</span><div><b>Mobile</b> — open on a phone → chat goes full-screen, sends fine.</div></li>
+  <li><span class="chk">☐</span><div><b>No regressions</b> — home, <code>/crisis</code>, <code>/ticker</code> still load normally after deploy.</div></li>
+</ul>
+<p class="muted">CSP note: your site's Content-Security-Policy is <b>Report-Only</b> (logs, doesn't block) so the coach works today. If you ever enforce it, add <code>https://alwaysbeme.app.n8n.cloud</code> to <code>connect-src</code>.</p>
+</div></body></html>
