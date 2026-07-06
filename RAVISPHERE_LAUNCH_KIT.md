@@ -159,7 +159,10 @@ Automations (Trigger: *Form submitted → HIT Brief Request*) or your ESP.
 
 > {{FirstName}},
 >
-> HIT is not a framework we borrowed. It's how RSI thinks.
+> HIT is not a framework we borrowed. It's how RSI thinks. HIT™ — Human
+> Intelligence Training™ — is the discipline of bringing clarity, discernment,
+> and people-first judgment back to technology decisions. It's delivered through
+> three moves, in order:
 >
 > **Harmonize** — We align technology, spend, and risk to the actual business
 > objective. Before recommending anything, we get the picture whole.
