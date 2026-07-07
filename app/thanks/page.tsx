@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-const PDF_URL = "https://drive.google.com/uc?export=download&id=1elVl2frHBjZV7JGO6m3ouDsjym0uMQLO";
+const PDF_URL =
+  "https://drive.google.com/uc?export=download&id=1elVl2frHBjZV7JGO6m3ouDsjym0uMQLO";
 
 export const metadata: Metadata = {
   title: "You\u2019re In | The HIT\u2122 Executive Brief | RSI Advisory",
@@ -84,29 +85,30 @@ export default function ThanksPage() {
             ))}
           </div>
 
+          {/* Download Brief CTA */}
+          <div className="bg-brand-dark-card border border-brand-dark-border rounded-xl p-8 text-center mb-6">
+            <h3 className="text-white font-bold text-lg mb-2">
+              Your HIT&#8482; Executive Brief is Ready
+            </h3>
+            <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+              Click below to download your executive brief.
+            </p>
+            <a
+              href={PDF_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-premium inline-block px-8 py-3.5 bg-brand-gold text-brand-dark font-bold rounded-lg text-sm tracking-wide"
+            >
+              Download Executive Brief &darr;
+            </a>
+          </div>
+
           {/* Primary CTA */}
           <div className="bg-brand-dark-card border border-brand-dark-border rounded-xl p-8 text-center mb-6">
             <p className="uppercase tracking-[0.2em] text-brand-gold/60 text-[10px] font-semibold mb-3">
               Optional
             </p>
             <h3 className="text-white font-bold text-lg mb-2">
-              {/* Download Brief CTA */}
-                            <div className="bg-brand-dark-card border border-brand-dark-border rounded-xl p-8 text-center mb-6">
-                                            <h3 className="text-white font-bold text-lg mb-2">
-                                                              Your HIT™ Executive Brief is Ready
-                                            </h3>
-                                            <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                                                              Click below to download your executive brief.
-                                            </p>
-                                            <a
-                                                                href={PDF_URL}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="btn-premium inline-block px-8 py-3.5 bg-brand-gold text-brand-dark font-bold rounded-lg text-sm tracking-wide"
-                                                              >
-                                                              Download Executive Brief &darr;
-                                            </a>
-                            </div></div>
               Book a HIT&#8482; Strategic Debrief
             </h3>
             <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
