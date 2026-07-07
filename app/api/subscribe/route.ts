@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getWelcomeEmailHtml, getWelcomeEmailText } from "./email-template";
 
-const KIT_API_KEY = process.env.KIT_API_KEY || "0WsI3-Dleh5UsqsceP8u3g";
+// Secrets come from env only (set in Vercel). The previously hard-coded Kit
+// key was leaked via git history and MUST be rotated in Kit → Settings → Developer.
+const KIT_API_KEY = process.env.KIT_API_KEY || "";
 const KIT_TAG_ID = process.env.KIT_TAG_ID || "18767608";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 
