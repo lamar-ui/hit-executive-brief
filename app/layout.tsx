@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.ravisphere.com"),
   title: "The HIT\u2122 Executive Brief | RSI Advisory",
   description:
     "Executive-grade technology clarity in 10 minutes. Custom strategic intelligence for decision-makers who don\u2019t have time to become technologists.",
