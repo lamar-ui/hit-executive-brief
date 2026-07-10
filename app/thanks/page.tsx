@@ -13,9 +13,16 @@ export default function ThanksPage() {
       {/* Nav */}
       <nav className="w-full bg-brand-dark/80 backdrop-blur-md border-b border-brand-dark-border">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center">
-          <span className="text-sm font-semibold tracking-wide text-white">
-            RSI<span className="text-brand-gold">&nbsp;Advisory</span>
-          </span>
+          <a href="/" aria-label="RSI Advisory — Home" className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/rsi-logo.png"
+              alt="RSI Advisory"
+              width={120}
+              height={32}
+              className="h-8 w-auto"
+            />
+          </a>
         </div>
       </nav>
 
