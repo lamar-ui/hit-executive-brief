@@ -2,26 +2,30 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.ravisphere.com"),
-  title: "The HIT\u2122 Executive Brief | RSI Advisory",
+  metadataBase: new URL("https://ravisphere.com"),
+  title: "RaviSphere Innovations | A trusted CIO partner in the room",
   description:
-    "Executive-grade technology clarity in 10 minutes. Custom strategic intelligence for decision-makers who don\u2019t have time to become technologists.",
+    "RSI puts a sitting CIO on your side of the table: bill reconciliation and sourcing, security baseline, fractional CIO, acquisition integration and vendor oversight for multi-site companies, PE portfolios and agencies.",
   openGraph: {
-    title: "The HIT\u2122 Executive Brief | RSI Advisory",
-    description:
-      "Executive-grade tech clarity in 10 minutes. Built for CEOs, COOs, and board members.",
+    title: "RaviSphere Innovations | A trusted CIO partner in the room",
+    description: "We solve, stabilize and secure. A sitting CIO on your side of the table.",
     type: "website",
+    url: "https://ravisphere.com",
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="bg-brand-dark">
-      <body className="min-h-screen bg-brand-dark text-gray-300 font-sans antialiased">
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600&family=Public+Sans:wght@400;500;600&display=swap"
+        />
+      </head>
+      <body className="min-h-screen antialiased" style={{ background: "#f6f7fb", color: "#1b2130" }}>
         {children}
       </body>
     </html>
