@@ -33,6 +33,8 @@ section.block{padding:64px 0}section.alt{background:#fff;border-top:1px solid va
 .person{display:grid;grid-template-columns:.9fr 1.1fr;gap:36px;align-items:center}@media(max-width:820px){.person{grid-template-columns:1fr}}
 .portrait{background:linear-gradient(135deg,#1b2130,#26306a);border-radius:20px;aspect-ratio:4/5;max-width:420px;display:flex;align-items:flex-end;padding:24px;color:#fff;position:relative;overflow:hidden}
 .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.portrait .mono{position:absolute;inset:0;display:grid;place-items:center;font-family:'Rubik',Arial,sans-serif;font-size:140px;font-weight:600;color:rgba(255,255,255,.14);letter-spacing:-.04em}
+.portrait .shield{position:absolute;left:24px;top:24px;height:72px;width:auto}
 .portrait .cap{position:relative;z-index:1;background:rgba(27,33,48,.72);border-radius:12px;padding:12px 14px;font-size:14px}.portrait .cap b{display:block;font-family:'Rubik',Arial,sans-serif;font-size:18px}
 .quote{font-family:'Rubik',Arial,sans-serif;font-size:clamp(20px,2.4vw,26px);font-weight:500;line-height:1.35;color:var(--ink);margin:0 0 18px}
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:18px}@media(max-width:600px){.facts{grid-template-columns:1fr}}.facts div{font-size:15px;color:var(--muted);padding-left:14px;border-left:3px solid var(--accent)}
@@ -102,7 +104,7 @@ footer{padding:28px 0 40px;color:var(--muted);font-size:13px;text-align:center}f
 </div></div></section>
 
 <section class="block alt" id="person"><div class="wrap"><div class="person">
-<div class="portrait"><div class="cap"><b>Lamar Dunn</b>Founder &amp; Principal CIO Advisor · Sitting CIO of a public company · Creator of RSI Decipher™</div></div>
+<div class="portrait"><div class="mono">LD</div><img class="shield" src="RSI_shield.png" alt="RSI"><div class="cap"><b>Lamar Dunn</b>Founder &amp; Principal CIO Advisor · Sitting CIO of a public company · Creator of RSI Decipher™</div></div>
 <div><span class="kicker">The person in the room</span>
 <p class="quote">"I hold the same job my clients are hiring for. That changes what I am willing to put my name on."</p>
 <p class="sub" style="margin-bottom:0">Lamar is the Chief Information Officer of a publicly traded company and the founder of RaviSphere Innovations. He has integrated 25 acquisitions, run technology for companies with hundreds of locations, and sat across the table from every major carrier and vendor on behalf of his clients. He advises an NFL team, an NBA organization, a multi-hundred-store retailer and a consortium of aging-services agencies.</p>
