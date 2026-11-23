@@ -3,12 +3,12 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ravisphere.com"),
-  title: "RaviSphere Innovations | A trusted CIO partner in the room",
+  title: "RaviSphere Innovations | A trusted CIO, CTO and CISO partner in the room",
   description:
-    "RSI puts a CIO on your side of the table: bill reconciliation and sourcing, security baseline, fractional CIO, acquisition integration and vendor oversight for multi-site companies, PE portfolios and agencies.",
+    "RSI puts a CIO, CTO or CISO on your side of the table: bill reconciliation and sourcing, security baseline, fractional and interim leadership, acquisition integration and vendor oversight for multi-site companies, PE portfolios and agencies.",
   openGraph: {
-    title: "RaviSphere Innovations | A trusted CIO partner in the room",
-    description: "We solve, stabilize and secure. A CIO on your side of the table.",
+    title: "RaviSphere Innovations | A trusted CIO, CTO and CISO partner in the room",
+    description: "We solve, stabilize and secure. A CIO, CTO or CISO on your side of the table.",
     type: "website",
     url: "https://ravisphere.com",
   },
